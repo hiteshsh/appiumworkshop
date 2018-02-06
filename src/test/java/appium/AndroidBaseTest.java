@@ -9,8 +9,10 @@ import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.MobilePlatform;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
+import io.appium.java_client.touch.TapOptions;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.ElementOption;
+import io.appium.java_client.touch.offset.PointOption;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
@@ -27,6 +29,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.Map;
 
 /**
  * Created by hiteshs on 12/27/17.
@@ -75,7 +78,7 @@ public class AndroidBaseTest {
     }
 
     @Test
-    public void basicAndroidCaps() throws InterruptedException, MalformedURLException {
+    public void slider() throws InterruptedException, MalformedURLException {
         DesiredCapabilities caps = new DesiredCapabilities();
         caps.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
         caps.setCapability(MobileCapabilityType.APP, "/Users/hiteshs/Documents/QA/AutomationProjects/build/VodQA.apk");
@@ -103,16 +106,10 @@ public class AndroidBaseTest {
         TouchAction action1 = new TouchAction(driver);
         action1.press(ElementOption.element(slider1).withCoordinates(0,d1.getHeight()/2))
                 .waitAction(WaitOptions.waitOptions(Duration.ofSeconds(2)))
-                .moveTo(ElementOption.element(slider)
+                .moveTo(ElementOption.element(slider1)
                         .withCoordinates(d1.getWidth(),d1.getHeight()/2));
 
         new MultiTouchAction(driver).add(action).add(action1).perform();
-
-
-
-
-
-
 
 //        touchAction.press(slider, 0,d.getHeight()/2)
 //                .waitAction(Duration.ofSeconds(3))
@@ -121,6 +118,86 @@ public class AndroidBaseTest {
 
         Thread.sleep(3000);
         driver.quit();
+    }
+
+    @Test
+    public void verticleSwipe()throws InterruptedException, MalformedURLException {
+        DesiredCapabilities caps = new DesiredCapabilities();
+        caps.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
+        caps.setCapability(MobileCapabilityType.APP, "/Users/hiteshs/Documents/QA/AutomationProjects/build/VodQA.apk");
+        caps.setCapability(MobileCapabilityType.DEVICE_NAME, "aa");
+        driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), caps);
+        Thread.sleep(3000);
+
+        driver.findElementByAccessibilityId("login").click();
+        Thread.sleep(3000);
+        driver.findElementByAccessibilityId("verticalSwipe").click();
+        Thread.sleep(3000);
+
+        MobileElement verticalSwipe= (MobileElement) driver.findElementByAccessibilityId("listview");
+        Dimension d=verticalSwipe.getSize();
+        TouchAction action= new TouchAction(driver);
+
+        action.press(ElementOption.element(verticalSwipe,d.getWidth()/2,d.getHeight()-20))
+                .waitAction(WaitOptions.waitOptions(Duration.ofSeconds(2)))
+                .moveTo(ElementOption.element(verticalSwipe,d.getWidth()/2,d.getHeight()/2+50)).release().perform();
+
+    }
+
+    @Test
+    public void dragAndDrop() throws InterruptedException, MalformedURLException {
+        DesiredCapabilities caps = new DesiredCapabilities();
+        caps.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
+        caps.setCapability(MobileCapabilityType.APP, "/Users/hiteshs/Documents/QA/AutomationProjects/build/VodQA.apk");
+        caps.setCapability(MobileCapabilityType.DEVICE_NAME, "aa");
+        caps.setCapability(MobileCapabilityType.AUTOMATION_NAME,"UiAutomator2");
+        driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), caps);
+        Thread.sleep(3000);
+
+        driver.findElementByAccessibilityId("login").click();
+        Thread.sleep(3000);
+        driver.findElementByAccessibilityId("dragAndDrop").click();
+        Thread.sleep(3000);
+
+        MobileElement drageMe= (MobileElement) driver.findElementByAccessibilityId("dragMe");
+        MobileElement dropZone= (MobileElement) driver.findElementByXPath("//android.view.ViewGroup[@content-desc=\"dropzone\"]/android.widget.TextView");
+        Dimension d=drageMe.getSize();
+        TouchAction action= new TouchAction(driver);
+
+//        action.press(ElementOption.element(drageMe,drageMe.getCenter().getX(),drageMe.getCenter().getY()))
+//                .waitAction(WaitOptions.waitOptions(Duration.ofSeconds(2)))
+//                .moveTo(ElementOption.element(dropZone,drageMe.getCenter().getX(),drageMe.getCenter().getY())).release().perform();
+
+        action.press(ElementOption.element(drageMe))
+                .waitAction(WaitOptions.waitOptions(Duration.ofSeconds(2)))
+                .moveTo(ElementOption.element(dropZone)).release().perform();
+
+//        action.press(drageMe)
+//                .waitAction(WaitOptions.waitOptions(Duration.ofSeconds(2)))
+//                .moveTo(dropZone).release().perform();
+
+        Thread.sleep(2000);
+    }
+
+    @Test
+    public void doubleTap() throws InterruptedException, MalformedURLException{
+
+        driver.findElementByAccessibilityId("login").click();
+        Thread.sleep(3000);
+        driver.findElementByAccessibilityId("doubleTap").click();
+        Thread.sleep(3000);
+
+        //TouchAction action= new TouchAction(driver);
+
+        WebElement doubleTapMe = driver.findElementByAccessibilityId("doubleTapMe");
+        TapOptions tapop= new TapOptions();
+            tapop
+                .withPosition(PointOption.point(doubleTapMe.getSize().getWidth() / 2,
+                        doubleTapMe.getSize().getHeight() / 2)).withTapsCount(2)
+                .build();
+        new TouchAction(driver).tap(tapop)
+                .waitAction(WaitOptions.waitOptions(Duration.ofSeconds(1))).release().perform();
+
     }
 
     //TODO - skip
