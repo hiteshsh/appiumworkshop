@@ -13,10 +13,9 @@ import io.appium.java_client.touch.TapOptions;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.ElementOption;
 import io.appium.java_client.touch.offset.PointOption;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -29,6 +28,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -150,7 +150,7 @@ public class AndroidBaseTest {
         caps.setCapability(MobileCapabilityType.PLATFORM_NAME, "android");
         caps.setCapability(MobileCapabilityType.APP, "/Users/hiteshs/Documents/QA/AutomationProjects/build/VodQA.apk");
         caps.setCapability(MobileCapabilityType.DEVICE_NAME, "aa");
-        caps.setCapability(MobileCapabilityType.AUTOMATION_NAME,"UiAutomator2");
+        caps.setCapability(MobileCapabilityType.AUTOMATION_NAME,"Espresso");
         driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), caps);
         Thread.sleep(3000);
 
@@ -160,7 +160,8 @@ public class AndroidBaseTest {
         Thread.sleep(3000);
 
         MobileElement drageMe= (MobileElement) driver.findElementByAccessibilityId("dragMe");
-        MobileElement dropZone= (MobileElement) driver.findElementByXPath("//android.view.ViewGroup[@content-desc=\"dropzone\"]/android.widget.TextView");
+        //MobileElement dropZone= (MobileElement) driver.findElementByXPath("//android.view.ViewGroup[@content-desc=\"dropzone\"]/android.widget.TextView");
+        MobileElement dropZone= (MobileElement) driver.findElementByAccessibilityId("dropZone");
         Dimension d=drageMe.getSize();
         TouchAction action= new TouchAction(driver);
 
@@ -168,9 +169,21 @@ public class AndroidBaseTest {
 //                .waitAction(WaitOptions.waitOptions(Duration.ofSeconds(2)))
 //                .moveTo(ElementOption.element(dropZone,drageMe.getCenter().getX(),drageMe.getCenter().getY())).release().perform();
 
-        action.press(ElementOption.element(drageMe))
-                .waitAction(WaitOptions.waitOptions(Duration.ofSeconds(2)))
-                .moveTo(ElementOption.element(dropZone)).release().perform();
+//        action.press(ElementOption.element(drageMe))
+//                .waitAction(WaitOptions.waitOptions(Duration.ofSeconds(2)))
+//                .moveTo(ElementOption.element(dropZone)).release().perform();
+
+        Point source = drageMe.getCenter();
+        Point target = dropZone.getCenter();
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence dragNDrop = new Sequence(finger, 1);
+        dragNDrop.addAction(finger.createPointerMove(Duration.ofSeconds(1),
+                PointerInput.Origin.viewport(), source.x, source.y));
+        dragNDrop.addAction(finger.createPointerDown(PointerInput.MouseButton.MIDDLE.asArg()));
+        dragNDrop.addAction(finger.createPointerMove(Duration.ofMillis(600),
+                PointerInput.Origin.viewport(),target.x, target.y));
+        dragNDrop.addAction(finger.createPointerUp(PointerInput.MouseButton.MIDDLE.asArg()));
+        driver.perform(Arrays.asList(dragNDrop));
 
 //        action.press(drageMe)
 //                .waitAction(WaitOptions.waitOptions(Duration.ofSeconds(2)))

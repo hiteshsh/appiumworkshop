@@ -1,45 +1,28 @@
 package appium;
 
-import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.TouchAction;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.touch.LongPressOptions;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.ElementOption;
-import io.appium.java_client.touch.offset.PointOption;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
 import org.testng.annotations.Test;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.Duration;
 
 /**
  * Created by hiteshs on 2/4/18.
  */
-public class GestureTest {
+public class GestureTest extends BaseTest{
 
-    public AppiumDriver driver;
 
     @Test
     public void horizontalSwipe() throws MalformedURLException, InterruptedException {
-        DesiredCapabilities caps = new DesiredCapabilities();
-        caps.setCapability(MobileCapabilityType.PLATFORM_NAME,
-                "iOS");
-        caps.setCapability(MobileCapabilityType.APP,
-                "/Users/hiteshs/Documents/QA/vodqa.zip");
-        caps.setCapability(MobileCapabilityType.DEVICE_NAME,
-                "iPhone X");
-        caps.setCapability(MobileCapabilityType.PLATFORM_VERSION,
-                "11.2");
-        driver = new IOSDriver(
-                new URL("http://127.0.0.1:4723/wd/hub"), caps);
-        Thread.sleep(3000);
 
+        Thread.sleep(3000);
         driver.findElementByAccessibilityId("login").click();
         Thread.sleep(2000);
         driver.findElementByAccessibilityId("slider1").click();
@@ -63,17 +46,7 @@ public class GestureTest {
 
     @Test
     public void test() throws MalformedURLException, InterruptedException {
-        DesiredCapabilities caps = new DesiredCapabilities();
-        caps.setCapability(MobileCapabilityType.PLATFORM_NAME,
-                "android");
-        caps.setCapability(MobileCapabilityType.APP,
-                "/Users/hiteshs/Documents/QA/AutomationProjects/build/VodQA.apk");
-        caps.setCapability(MobileCapabilityType.DEVICE_NAME,
-                "test");
-//        caps.setCapability(MobileCapabilityType.PLATFORM_VERSION,
-//                "11.2");
-        driver = new AndroidDriver(
-                new URL("http://127.0.0.1:4723/wd/hub"), caps);
+
         Thread.sleep(3000);
 
         driver.findElementByAccessibilityId("login").click();
@@ -96,17 +69,7 @@ public class GestureTest {
 
     @Test
     public void longPress() throws MalformedURLException, InterruptedException {
-        DesiredCapabilities caps = new DesiredCapabilities();
-        caps.setCapability(MobileCapabilityType.PLATFORM_NAME,
-                "android");
-        caps.setCapability(MobileCapabilityType.APP,
-                "/Users/hiteshs/Documents/QA/AutomationProjects/build/VodQA.apk");
-        caps.setCapability(MobileCapabilityType.DEVICE_NAME,
-                "test");
-//        caps.setCapability(MobileCapabilityType.PLATFORM_VERSION,
-//                "11.2");
-        driver = new AndroidDriver(
-                new URL("http://127.0.0.1:4723/wd/hub"), caps);
+
         Thread.sleep(3000);
 
         driver.findElementByAccessibilityId("login").click();
@@ -124,4 +87,25 @@ public class GestureTest {
         Thread.sleep(2000);
         driver.quit();
     }
+
+    @Test
+    public void dragAndDrop() throws InterruptedException, MalformedURLException {
+
+        Thread.sleep(3000);
+
+        driver.findElementByAccessibilityId("login").click();
+        Thread.sleep(2000);
+        driver.findElementByAccessibilityId("dragAndDrop").click();
+
+        Thread.sleep(2000);
+        MobileElement source = (MobileElement) driver.findElementByAccessibilityId("dragMe");
+        MobileElement target = (MobileElement) driver.findElementByAccessibilityId("dropzone");
+        Actions actionBuilder = new Actions(driver);
+        Action dragAndDropAction = actionBuilder.clickAndHold(source)
+                .moveToElement(target, 1, 1)
+                .release(target)
+                .build();
+        dragAndDropAction.perform();
+    }
+
 }
